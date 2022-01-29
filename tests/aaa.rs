@@ -3,7 +3,7 @@ use tokenizer::{Tokenizer, TypeEq};
 
 #[test]
 fn main() {
-    let code = "aa aaaa aa a";
+    let code = "  aa aaaa aa a";
     let mut tokenizer = Tokenizer::new(Token::lexer(code), vec![Token::Space]);
 
     assert_eq!(tokenizer.current(), None);

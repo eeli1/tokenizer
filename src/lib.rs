@@ -62,10 +62,29 @@ where
         let index = 0;
         let len = 0;
 
-        let next = lexer.next();
-        let next_index = lexer.span().start;
-        let next_len = lexer.span().len();
+        let mut next = lexer.next();
+        let mut next_index = lexer.span().start;
+        let mut next_len = lexer.span().len();
+        loop {
+            if let Some(token) = next.clone() {
+                let mut found = false;
+                for t in ignore.iter() {
+                    if token.type_eq(t) {
+                        next = lexer.next();
+                        next_index = lexer.span().start;
+                        next_len = lexer.span().len();
+                        found = true;
+                        break;
+                    }
+                }
 
+                if !found {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
         Self {
             lexer,
             current,
@@ -118,11 +137,12 @@ where
     pub fn expect_multi(&mut self, tokens: Vec<Token>) -> Result<Token, Error> {
         if let Some(token) = self.current.clone() {
             self.next();
-            if !self.can_ignore(&token) {
-                Ok(token)
-            } else {
-                Err(self.error(&format!("expect tokens {:?} but got {:?}", tokens, token)))
+            for t in tokens.iter() {
+                if token.type_eq(t) {
+                    return Ok(token);
+                }
             }
+            return Err(self.error(&format!("expect tokens {:?} but got {:?}", tokens, token)));
         } else {
             Err(self.error(&format!(
                 "expect tokens {:?} but got {}",
