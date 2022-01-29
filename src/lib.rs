@@ -110,7 +110,7 @@ where
     }
 
     pub fn expect(&mut self, token: Token) -> Result<Token, Error> {
-        if let Some(got) = self.current.clone() {
+        if let Some(got) = self.next() {
             self.next();
             if token.type_eq(&got) {
                 Ok(got)
@@ -135,7 +135,7 @@ where
     }
 
     pub fn expect_multi(&mut self, tokens: Vec<Token>) -> Result<Token, Error> {
-        if let Some(token) = self.current.clone() {
+        if let Some(token) = self.next() {
             self.next();
             for t in tokens.iter() {
                 if token.type_eq(t) {
