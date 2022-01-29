@@ -92,6 +92,7 @@ where
 
     pub fn expect(&mut self, token: Token) -> Result<Token, Error> {
         if let Some(got) = self.current.clone() {
+            self.next();
             if token.type_eq(&got) {
                 Ok(got)
             } else {
@@ -115,11 +116,12 @@ where
     }
 
     pub fn expect_multi(&mut self, tokens: Vec<Token>) -> Result<Token, Error> {
-        if let Some(got) = self.current.clone() {
-            if !self.can_ignore(&got) {
-                Ok(got)
+        if let Some(token) = self.current.clone() {
+            self.next();
+            if !self.can_ignore(&token) {
+                Ok(token)
             } else {
-                Err(self.error(&format!("expect tokens {:?} but got {:?}", tokens, got)))
+                Err(self.error(&format!("expect tokens {:?} but got {:?}", tokens, token)))
             }
         } else {
             Err(self.error(&format!(
@@ -127,6 +129,42 @@ where
                 tokens, "end of file"
             )))
         }
+    }
+
+    pub fn is(&self, token: Token) -> bool {
+        if let Some(got) = self.current.clone() {
+            return got.type_eq(&token);
+        }
+        return false;
+    }
+
+    pub fn is_multi(&self, tokens: Vec<Token>) -> bool {
+        if let Some(got) = self.current.clone() {
+            for t in tokens {
+                if got.type_eq(&t) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    pub fn next_is(&self, token: Token) -> bool {
+        if let Some(got) = self.next.clone() {
+            return got.type_eq(&token);
+        }
+        return false;
+    }
+
+    pub fn next_is_multi(&self, tokens: Vec<Token>) -> bool {
+        if let Some(got) = self.next.clone() {
+            for t in tokens {
+                if got.type_eq(&t) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
 
