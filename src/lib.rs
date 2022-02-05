@@ -231,7 +231,7 @@ pub struct Error {
 }
 
 impl Error {
-    fn new(index: Option<usize>, len: Option<usize>, msg: String) -> Self {
+    pub fn new(index: Option<usize>, len: Option<usize>, msg: String) -> Self {
         Self { index, len, msg }
     }
 }
