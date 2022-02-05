@@ -124,6 +124,23 @@ where
             )))
         }
     }
+    
+    pub fn expect_next(&mut self, token: Token) -> Result<Token, Error> {
+        if let Some(got) = self.peek() {
+            self.next();
+            if token.type_eq(&got) {
+                Ok(got)
+            } else {
+                Err(self.error(&format!("expect token {:?} but got {:?}", token, got)))
+            }
+        } else {
+            Err(self.error(&format!(
+                "expect token {:?} but got {}",
+                token, "end of file"
+            )))
+        }
+    }
+
 
     fn can_ignore(&self, token: &Token) -> bool {
         for t in self.ignore.clone() {
@@ -233,5 +250,9 @@ pub struct Error {
 impl Error {
     pub fn new(index: Option<usize>, len: Option<usize>, msg: String) -> Self {
         Self { index, len, msg }
+    }
+    
+    pub fn msg(msg: &str) -> Self {
+        Self { index: None, len: None, msg: msg.to_string() }
     }
 }
